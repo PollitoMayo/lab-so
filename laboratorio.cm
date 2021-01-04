@@ -1,34 +1,43 @@
-semaphore hayGuias;
-string[200] out;
+semaphore hayGuias;				// Semáforo que cuenta los guías
 
-int X = 2;
-int Y = 12;
+int X = 2;						// Cantidad de guías para el ejercicio. Dato modificable.
+int Y = 12;						// Cantidad de turistas para el ejercicio. Dato modificable.
+int cola[12];					// Cola definida según la cantidad de turistas. Dato modificable.
 
-int cola[12];
+int guiasDisponibles;			// Cantidad de guías disponibles.
+int turistasEnCola = 0;			// Cantidad de turistas en la cola.
 
-int guiasDisponibles;
-int turistasEnCola = 0;
+// Función Descolar
+// Función que devuelve el primer elemento, el cual será el ID del proceso de un hilo, y modifica el arreglo.
 
 int descolar() {
-	int e;
+	int e;		
 	int i;
 
 	if (turistasEnCola > 0) {
-		e = cola[0];
 		turistasEnCola = turistasEnCola - 1;
+		e = cola[0];			// Elemento a devolver
 
+		// Se modifica el arreglo
 		for (i = 1; i <= turistasEnCola; i = i + 1) {
 			cola[i - 1] = cola[i];
 		}
 	}
-	
 	return e;
 }
+// Fin de Función Descolar
+
+// Función Encolar
+// Función que agrega un elemento al arreglo.
 
 void encolar(int e) {
 	cola[turistasEnCola] = e;
 	turistasEnCola = turistasEnCola + 1;
 }
+// Fin de Función Encolar
+
+// Función Hacer Tiempo
+// Función auxiliar utilizada para demostrar el orden de los procesos.
 
 void hacerTiempo(int x) {
 	int i;
@@ -36,56 +45,57 @@ void hacerTiempo(int x) {
 		cout << "";
 	}
 }
+// Fin Función Hacer Tiempo
+
+// Función Control Acceso
+// Función principal en la que se desarrolla el problema planteado.
+// Un turista entra con un guía. Y de no haber guía, espera hasta que uno regrese.
 
 void controlAcceso(int turistaId, int guiasTotales) {
 	int procesoId;
 	if (guiasDisponibles < 1) {
+		// Si no hay guías disponibles se guarda el número del proceso del hilo, y se suspende.
+
 		procesoId = which_proc();
 		encolar(procesoId);
-
 		cout << "Turista " << turistaId << " esta esperando por un guia" << endl;
-
 		suspend();
 	}
 
-	p(hayGuias); // Se espera a que haya un guia disponible
-
+	p(hayGuias); 				// Se espera a que haya un guia disponible.
 	guiasDisponibles = guiasDisponibles - 1;
-
 	cout << "Turista " << turistaId << " accedio al templo con un guia | Guias disponibles: " << guiasDisponibles << endl;
-
-	hacerTiempo(1000);
-
-
-	guiasDisponibles = guiasDisponibles + 1;
 	
-	v(hayGuias);
+	hacerTiempo(1000);			// Se crea un espacio de tiempo para la simulación antes de que vuelva un guía.
+	guiasDisponibles = guiasDisponibles + 1;
+
+	v(hayGuias);				// De no haber guías, no realiza nada. En caso contrario, continúa la ejecución.
 	cout << "Llego un guia | Guias disponibles: " << guiasDisponibles << endl;
 
 	if (turistasEnCola > 0) {
+		// De regresar un guía, se obtiene el número del proceso guardado previamente para revivirlo y continuar con el primer turista en cola.
 		procesoId = descolar();
 		revive(procesoId);
 	}
-	
 }
+// Fin Función Control Acceso
 
+// Función Ver Sala Exposición
+// Función que permite dejar constancia de que un turista ha accedido por la sala de exposición.
 void verSalaExposicion(int turistaId, int guiasTotales) {
 	hacerTiempo(10);
-	
 	cout << "Turista " << turistaId << " paso por la sala de exposicion" << endl;
-
 	controlAcceso(turistaId, guiasTotales);
 }
-
-void tour(int X, int Y) { 
-}
+// Fin Función Ver Sala Exposición
 
 main() {
-	guiasDisponibles = X;
 
-	initialsem(hayGuias, X);
+	guiasDisponibles = X;
+	initialsem(hayGuias, X);	// Se inicializa el semáforo para la cantidad de guías
 
 	cobegin {
+		// Se llaman a tantos procesos como turistas hayan, determinado por Y (Definida al comienzo del proyecto). 
 		verSalaExposicion(0, X);
 		verSalaExposicion(1, X);
 		verSalaExposicion(2, X);
