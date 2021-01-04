@@ -1,0 +1,40 @@
+BACI System: C-- to PCODE Compiler in Java, 09:45  05 Nov 2007
+Source File:  laboratorio.cm  dom ene 03 21:29:31 2021
+ line  pc
+   1   0  semaphore cola;
+   2   0  semaphore guias;
+   3   0  
+   4   0  void accederTemplo(int id)
+   5   0  {
+   6   0  	cout << "Turista " << id << " esta esperando por un guia (" << guias << ")" << endl;
+   7   8  	// v()
+   8   8  	p(guias); // Se espera a que haya un guia disponible
+   9  10  	cout << "Turista " << id << " encontro un guia (" << guias << ")" << endl;
+  10  18  }
+  11  18  
+  12  18  void verSalaExposicion(int id)
+  13  19  {
+  14  19  	cout << "Turista " << id << " llego a la sala de exposicion" << endl;
+  15  24  	accederTemplo(id);
+  16  28  }
+  17  28  
+  18  28  void tour(int X, int Y)
+  19  29  { // X seran los guias, Y seran los visitantes
+  20  29  }
+  21  29  
+  22  29  main()
+  23  30  {
+  24  31  	int X = 10;
+  25  34  	int Y = 23;
+  26  37  	int i;
+  27  37  
+  28  37  	initialsem(cola, Y);
+  29  40  	initialsem(guias, X);
+  30  43  	cobegin
+  31  43  	{
+  32  44  		for (i = 0; i < Y; i = i + 1)
+  33  58  		{
+  34  58  			verSalaExposicion(i);
+  35  62  		}
+  36  62  	}
+  37  63  }

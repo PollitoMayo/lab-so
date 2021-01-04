@@ -1,0 +1,37 @@
+semaphore cola;
+semaphore guias;
+
+void accederTemplo(int id)
+{
+	cout << "Turista " << id << " esta esperando por un guia (" << guias << ")" << endl;
+	// v()
+	p(guias); // Se espera a que haya un guia disponible
+	cout << "Turista " << id << " encontro un guia (" << guias << ")" << endl;
+}
+
+void verSalaExposicion(int id)
+{
+	cout << "Turista " << id << " llego a la sala de exposicion" << endl;
+	accederTemplo(id);
+}
+
+void tour(int X, int Y)
+{ // X seran los guias, Y seran los visitantes
+}
+
+main()
+{
+	int X = 10;
+	int Y = 23;
+	int i;
+
+	initialsem(cola, Y);
+	initialsem(guias, X);
+	cobegin
+	{
+		for (i = 0; i < Y; i = i + 1)
+		{
+			verSalaExposicion(i);
+		}
+	}
+}
