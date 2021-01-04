@@ -1,40 +1,108 @@
 BACI System: C-- to PCODE Compiler in Java, 09:45  05 Nov 2007
-Source File:  laboratorio.cm  dom ene 03 21:29:31 2021
+Source File:  laboratorio.cm  lun. ene. 04 17:02:21 2021
  line  pc
-   1   0  semaphore cola;
-   2   0  semaphore guias;
+   1   0  semaphore hayGuias;
+   2   0  string[200] out;
    3   0  
-   4   0  void accederTemplo(int id)
-   5   0  {
-   6   0  	cout << "Turista " << id << " esta esperando por un guia (" << guias << ")" << endl;
-   7   8  	// v()
-   8   8  	p(guias); // Se espera a que haya un guia disponible
-   9  10  	cout << "Turista " << id << " encontro un guia (" << guias << ")" << endl;
-  10  18  }
-  11  18  
-  12  18  void verSalaExposicion(int id)
-  13  19  {
-  14  19  	cout << "Turista " << id << " llego a la sala de exposicion" << endl;
-  15  24  	accederTemplo(id);
-  16  28  }
-  17  28  
-  18  28  void tour(int X, int Y)
-  19  29  { // X seran los guias, Y seran los visitantes
-  20  29  }
-  21  29  
-  22  29  main()
-  23  30  {
-  24  31  	int X = 10;
-  25  34  	int Y = 23;
-  26  37  	int i;
-  27  37  
-  28  37  	initialsem(cola, Y);
-  29  40  	initialsem(guias, X);
-  30  43  	cobegin
-  31  43  	{
-  32  44  		for (i = 0; i < Y; i = i + 1)
-  33  58  		{
-  34  58  			verSalaExposicion(i);
-  35  62  		}
-  36  62  	}
-  37  63  }
+   4   0  int X = 2;
+   5   0  int Y = 12;
+   6   0  
+   7   0  int cola[12];
+   8   0  
+   9   0  int guiasDisponibles;
+  10   0  int turistasEnCola = 0;
+  11   0  
+  12   0  int descolar() {
+  13   0  	int e;
+  14   0  	int i;
+  15   0  
+  16   0  	if (turistasEnCola > 0) {
+  17   4  		e = cola[0];
+  18  10  		turistasEnCola = turistasEnCola - 1;
+  19  15  
+  20  15  		for (i = 1; i <= turistasEnCola; i = i + 1) {
+  21  29  			cola[i - 1] = cola[i];
+  22  39  		}
+  23  39  	}
+  24  40  	
+  25  40  	return e;
+  26  41  }
+  27  44  
+  28  44  void encolar(int e) {
+  29  45  	cola[turistasEnCola] = e;
+  30  50  	turistasEnCola = turistasEnCola + 1;
+  31  55  }
+  32  55  
+  33  55  void hacerTiempo(int x) {
+  34  56  	int i;
+  35  56  	for (i = 0; i < x * 1000; i = i + 1) {
+  36  72  		cout << "";
+  37  73  	}
+  38  73  }
+  39  74  
+  40  74  void controlAcceso(int turistaId, int guiasTotales) {
+  41  75  	int procesoId;
+  42  75  	if (guiasDisponibles < 1) {
+  43  79  		procesoId = which_proc();
+  44  82  		encolar(procesoId);
+  45  86  
+  46  86  		cout << "Turista " << turistaId << " esta esperando por un guia" << endl;
+  47  91  
+  48  91  		suspend();
+  49  92  	}
+  50  92  
+  51  92  	p(hayGuias); // Se espera a que haya un guia disponible
+  52  94  
+  53  94  	guiasDisponibles = guiasDisponibles - 1;
+  54  99  
+  55  99  	cout << "Turista " << turistaId << " accedio al templo con un guia | Guias disponibles: " << guiasDisponibles << endl;
+  56 106  
+  57 106  	hacerTiempo(1000);
+  58 110  
+  59 110  
+  60 110  	guiasDisponibles = guiasDisponibles + 1;
+  61 115  	
+  62 115  	v(hayGuias);
+  63 117  	cout << "Llego un guia | Guias disponibles: " << guiasDisponibles << endl;
+  64 121  
+  65 121  	if (turistasEnCola > 0) {
+  66 125  		procesoId = descolar();
+  67 130  		revive(procesoId);
+  68 132  	}
+  69 132  	
+  70 132  }
+  71 132  
+  72 132  void verSalaExposicion(int turistaId, int guiasTotales) {
+  73 133  	hacerTiempo(10);
+  74 137  	
+  75 137  	cout << "Turista " << turistaId << " paso por la sala de exposicion" << endl;
+  76 142  
+  77 142  	controlAcceso(turistaId, guiasTotales);
+  78 147  }
+  79 147  
+  80 147  void tour(int X, int Y) { 
+  81 148  }
+  82 148  
+  83 148  main() {
+  84 150  	
+  85 150  	
+  86 150  	guiasDisponibles = X;
+  87 153  
+  88 153  	initialsem(hayGuias, X);
+  89 156  
+  90 156  
+  91 156  	cobegin {
+  92 157  		verSalaExposicion(0, X);
+  93 162  		verSalaExposicion(1, X);
+  94 167  		verSalaExposicion(2, X);
+  95 172  		verSalaExposicion(3, X);
+  96 177  		verSalaExposicion(4, X);
+  97 182  		verSalaExposicion(5, X);
+  98 187  		verSalaExposicion(6, X);
+  99 192  		verSalaExposicion(7, X);
+ 100 197  		verSalaExposicion(8, X);
+ 101 202  		verSalaExposicion(9, X);
+ 102 207  		verSalaExposicion(10, X);
+ 103 212  		verSalaExposicion(11, X);
+ 104 217  	}
+ 105 217  }

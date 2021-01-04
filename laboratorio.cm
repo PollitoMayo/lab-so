@@ -1,37 +1,102 @@
-semaphore cola;
-semaphore guias;
+semaphore hayGuias;
+string[200] out;
 
-void accederTemplo(int id)
-{
-	cout << "Turista " << id << " esta esperando por un guia (" << guias << ")" << endl;
-	// v()
-	p(guias); // Se espera a que haya un guia disponible
-	cout << "Turista " << id << " encontro un guia (" << guias << ")" << endl;
-}
+int X = 2;
+int Y = 12;
 
-void verSalaExposicion(int id)
-{
-	cout << "Turista " << id << " llego a la sala de exposicion" << endl;
-	accederTemplo(id);
-}
+int cola[12];
 
-void tour(int X, int Y)
-{ // X seran los guias, Y seran los visitantes
-}
+int guiasDisponibles;
+int turistasEnCola = 0;
 
-main()
-{
-	int X = 10;
-	int Y = 23;
+int descolar() {
+	int e;
 	int i;
 
-	initialsem(cola, Y);
-	initialsem(guias, X);
-	cobegin
-	{
-		for (i = 0; i < Y; i = i + 1)
-		{
-			verSalaExposicion(i);
+	if (turistasEnCola > 0) {
+		e = cola[0];
+		turistasEnCola = turistasEnCola - 1;
+
+		for (i = 1; i <= turistasEnCola; i = i + 1) {
+			cola[i - 1] = cola[i];
 		}
+	}
+	
+	return e;
+}
+
+void encolar(int e) {
+	cola[turistasEnCola] = e;
+	turistasEnCola = turistasEnCola + 1;
+}
+
+void hacerTiempo(int x) {
+	int i;
+	for (i = 0; i < x * 1000; i = i + 1) {
+		cout << "";
+	}
+}
+
+void controlAcceso(int turistaId, int guiasTotales) {
+	int procesoId;
+	if (guiasDisponibles < 1) {
+		procesoId = which_proc();
+		encolar(procesoId);
+
+		cout << "Turista " << turistaId << " esta esperando por un guia" << endl;
+
+		suspend();
+	}
+
+	p(hayGuias); // Se espera a que haya un guia disponible
+
+	guiasDisponibles = guiasDisponibles - 1;
+
+	cout << "Turista " << turistaId << " accedio al templo con un guia | Guias disponibles: " << guiasDisponibles << endl;
+
+	hacerTiempo(1000);
+
+
+	guiasDisponibles = guiasDisponibles + 1;
+	
+	v(hayGuias);
+	cout << "Llego un guia | Guias disponibles: " << guiasDisponibles << endl;
+
+	if (turistasEnCola > 0) {
+		procesoId = descolar();
+		revive(procesoId);
+	}
+	
+}
+
+void verSalaExposicion(int turistaId, int guiasTotales) {
+	hacerTiempo(10);
+	
+	cout << "Turista " << turistaId << " paso por la sala de exposicion" << endl;
+
+	controlAcceso(turistaId, guiasTotales);
+}
+
+void tour(int X, int Y) { 
+}
+
+main() {
+	guiasDisponibles = X;
+
+	initialsem(hayGuias, X);
+
+	cobegin {
+		verSalaExposicion(0, X);
+		verSalaExposicion(1, X);
+		verSalaExposicion(2, X);
+		verSalaExposicion(3, X);
+		verSalaExposicion(4, X);
+		verSalaExposicion(5, X);
+		verSalaExposicion(6, X);
+		verSalaExposicion(7, X);
+		verSalaExposicion(8, X);
+		verSalaExposicion(9, X);
+		verSalaExposicion(10, X);
+		verSalaExposicion(11, X);
 	}
 }
